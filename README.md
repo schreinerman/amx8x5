@@ -1,12 +1,25 @@
-Ambiq AMx8x5 RTC Driver
------------------------------
+# Ambiq AMx8x5 RTC Driver
 
 This driver can be used for Ambiq, Abracom and Microcrystal ABx8x5 / AMx8x5 RTCs.
 
-Supported RTCs: Ambiq AM0805, AM0815, AM1805 and AM1815; Abracom AB0805, AB0815, AB1805 and AB1815; Microcrystal RV1805
+## Supported RTCs: 
 
-License:
---------
+### Ambiq 
+- AM0805
+- AM0815
+- AM0805
+- AM0815
+
+### Abracom
+- AB0805
+- AB0815
+- AB0805
+- AB0815
+
+### Microcrystal
+- RV1805
+
+## License:
 
 Created by Manuel Schreiner
 

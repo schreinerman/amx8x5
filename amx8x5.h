@@ -2829,6 +2829,11 @@ en_result_t Amx8x5_EnableIrqBatteryLow(stc_amx8x5_handle_t* pstcHandle, bool bEn
 en_result_t Amx8x5_EnableTrickleCharger(stc_amx8x5_handle_t* pstcHandle, en_amx8x5_trickle_diode_t enDiode, en_amx8x5_trickle_resistor_t enResistor, bool bEnable);
 en_result_t Amx8x5_SetBatteryReferenceVoltage(stc_amx8x5_handle_t* pstcHandle, en_amx8x5_bat_reference_t enBref);
 
+en_result_t Amx8x5_EnableInterrupt(stc_amx8x5_handle_t* pstcHandle, uint8_t u8IrqMask);
+en_result_t Amx8x5_DisableInterrupt(stc_amx8x5_handle_t* pstcHandle, uint8_t u8IrqMask);
+en_result_t Amx8x5_ClearInterrupts(stc_amx8x5_handle_t* pstcHandle);
+en_result_t Amx8x5_ClearInterrupt(stc_amx8x5_handle_t* pstcHandle,uint8_t u8IrqMask);
+en_result_t Amx8x5_GetInterruptStatus(stc_amx8x5_handle_t* pstcHandle, uint8_t* pu8Status);
 
 en_result_t Amx8x5_SetWatchdog(stc_amx8x5_handle_t* pstcHandle, uint32_t u32Period, en_amx8x5_watchdog_interrupt_pin_t enPin);
 en_result_t Amx8x5_SetSleepMode(stc_amx8x5_handle_t* pstcHandle, uint8_t ui8Timeout, en_amx8x5_sleep_mode_t enMode);
@@ -2968,6 +2973,13 @@ class AMx8x5
       AMx8x5::enResult enableIrqBatteryLow(bool bEnabled);
       AMx8x5::enResult enableTrickleCharger(AMx8x5::enTrickleDiode enDiode, AMx8x5::enTrickleResistor enResistor, bool bEnable);
       AMx8x5::enResult setBatteryReferenceVoltage(AMx8x5::enBatReference enBref);
+
+      AMx8x5::enResult enableInterrupt(uint8_t u8IrqMask);
+      AMx8x5::enResult disableInterrupt(uint8_t u8IrqMask);
+      AMx8x5::enResult clearInterrupts(void);
+      AMx8x5::enResult clearInterrupt(uint8_t u8IrqMask);
+      AMx8x5::enResult getInterruptStatus(uint8_t* pu8Status);
+
 
       AMx8x5::enResult setWatchdog(uint32_t u32Period, AMx8x5::enWatchdogInterruptPin enPin);
       AMx8x5::enResult setSleepMode(uint8_t ui8Timeout, AMx8x5::enSleepMode enMode);

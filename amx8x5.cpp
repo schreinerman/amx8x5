@@ -790,6 +790,228 @@ en_result_t Amx8x5_GetTime(stc_amx8x5_handle_t* pstcHandle, stc_amx8x5_time_t** 
 }
 
 /**
+ ** @brief Get Time - Hundredth
+ ** 
+ ** @param pstcHandle RTC Handle
+ ** @return int16_t the value, -1 on error
+ **/
+int16_t Amx8x5_GetHundredth(stc_amx8x5_handle_t* pstcHandle)
+{
+    uint8_t u8Temp;
+    en_result_t res;
+
+    AMX8X5_DEBUG_FUNC_START("Amx8x5_GetHundredth");
+
+    res = Amx8x5_ReadBytes(pstcHandle,AMX8X5_REG_HUNDREDTHS,&u8Temp,1);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(-1);
+    }
+    return AMX8X5_BCD_TO_DEC(u8Temp);
+
+    stcSysTime.u8Hundredth = AMX8X5_BCD_TO_DEC(pu8Buffer[0]);
+    stcSysTime.u8Second = AMX8X5_BCD_TO_DEC(pu8Buffer[1]);
+    stcSysTime.u8Minute = AMX8X5_BCD_TO_DEC(pu8Buffer[2]);
+    stcSysTime.u8Hour = pu8Buffer[3];
+    stcSysTime.u8Date = AMX8X5_BCD_TO_DEC(pu8Buffer[4]);
+    stcSysTime.u8Month = AMX8X5_BCD_TO_DEC(pu8Buffer[5]);
+    stcSysTime.u8Year = AMX8X5_BCD_TO_DEC(pu8Buffer[6]);
+    stcSysTime.u8Weekday = AMX8X5_BCD_TO_DEC(pu8Buffer[7]);
+}
+
+/**
+ ** @brief Get Time - Second
+ ** 
+ ** @param pstcHandle RTC Handle
+ ** @return int16_t the value, -1 on error
+ **/
+int16_t Amx8x5_GetSecond(stc_amx8x5_handle_t* pstcHandle)
+{
+    uint8_t u8Temp;
+    en_result_t res;
+
+    AMX8X5_DEBUG_FUNC_START("Amx8x5_GetSecond");
+
+    res = Amx8x5_ReadBytes(pstcHandle,AMX8X5_REG_SECONDS,&u8Temp,1);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(-1);
+    }
+    return AMX8X5_BCD_TO_DEC(u8Temp);
+}
+
+/**
+ ** @brief Get Time - Minute
+ ** 
+ ** @param pstcHandle RTC Handle
+ ** @return int16_t the value, -1 on error
+ **/
+int16_t Amx8x5_GetMinute(stc_amx8x5_handle_t* pstcHandle)
+{
+    uint8_t u8Temp;
+    en_result_t res;
+
+    AMX8X5_DEBUG_FUNC_START("Amx8x5_GetMinute");
+
+    res = Amx8x5_ReadBytes(pstcHandle,AMX8X5_REG_MINUTES,&u8Temp,1);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(-1);
+    }
+    return AMX8X5_BCD_TO_DEC(u8Temp);
+}
+
+/**
+ ** @brief Get Time - Hour
+ ** 
+ ** @param pstcHandle RTC Handle
+ ** @return int16_t the value, -1 on error
+ **/
+int16_t Amx8x5_GetHour(stc_amx8x5_handle_t* pstcHandle)
+{
+    uint8_t u8Temp,u8Control;
+    en_result_t res;
+
+    AMX8X5_DEBUG_FUNC_START("Amx8x5_GetHour");
+
+    res = Amx8x5_ReadBytes(pstcHandle,AMX8X5_REG_HOURS,&u8Temp,1);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(-1);
+    }
+
+    res = Amx8x5_ReadByte(pstcHandle,AMX8X5_REG_CONTROL_1,&u8Control);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(-1);
+    }
+    
+    if ((u8Control & 0x40) == 0)
+    {
+        //
+        // 24-hour mode.
+        //
+        u8Temp &= 0x3F;
+    }
+    else
+    {
+        //
+        // 12-hour mode.  Get PM:AM.
+        //
+        u8Temp &= 0x1F;
+    }
+    return AMX8X5_BCD_TO_DEC(u8Temp);
+}
+
+/**
+ ** @brief Get Time - Day
+ ** 
+ ** @param pstcHandle RTC Handle
+ ** @return int16_t the value, -1 on error
+ **/
+int16_t Amx8x5_GetDay(stc_amx8x5_handle_t* pstcHandle)
+{
+    uint8_t u8Temp;
+    en_result_t res;
+
+    AMX8X5_DEBUG_FUNC_START("Amx8x5_GetDay");
+
+    res = Amx8x5_ReadBytes(pstcHandle,AMX8X5_REG_DATE,&u8Temp,1);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(-1);
+    }
+    return AMX8X5_BCD_TO_DEC(u8Temp);
+}
+
+/**
+ ** @brief Get Time - Weekday
+ ** 
+ ** @param pstcHandle RTC Handle
+ ** @return int16_t the value, -1 on error
+ **/
+int16_t Amx8x5_GetWeekday(stc_amx8x5_handle_t* pstcHandle)
+{
+    uint8_t u8Temp;
+    en_result_t res;
+
+    AMX8X5_DEBUG_FUNC_START("Amx8x5_GetWeekday");
+
+    res = Amx8x5_ReadBytes(pstcHandle,AMX8X5_REG_WEEKDAY,&u8Temp,1);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(-1);
+    }
+    return AMX8X5_BCD_TO_DEC(u8Temp);
+}
+
+/**
+ ** @brief Get Time - Month
+ ** 
+ ** @param pstcHandle RTC Handle
+ ** @return int16_t the value, -1 on error
+ **/
+int16_t Amx8x5_GetMonth(stc_amx8x5_handle_t* pstcHandle)
+{
+    uint8_t u8Temp;
+    en_result_t res;
+
+    AMX8X5_DEBUG_FUNC_START("Amx8x5_GetMonth");
+
+    res = Amx8x5_ReadBytes(pstcHandle,AMX8X5_REG_MONTH,&u8Temp,1);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(-1);
+    }
+    return AMX8X5_BCD_TO_DEC(u8Temp);
+}
+
+/**
+ ** @brief Get Time - Year
+ ** 
+ ** @param pstcHandle RTC Handle
+ ** @return int16_t the value, -1 on error
+ **/
+int16_t Amx8x5_GetYear(stc_amx8x5_handle_t* pstcHandle)
+{
+    uint8_t u8Temp;
+    en_result_t res;
+
+    AMX8X5_DEBUG_FUNC_START("Amx8x5_GetYear");
+
+    res = Amx8x5_ReadBytes(pstcHandle,AMX8X5_REG_YEARS,&u8Temp,1);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(-1);
+    }
+    return AMX8X5_BCD_TO_DEC(u8Temp);
+}
+
+/**
+ ** @brief Get Time - Century
+ ** 
+ ** @param pstcHandle RTC Handle
+ ** @return int16_t the value, -1 on error
+ **/
+int16_t Amx8x5_GetCentury(stc_amx8x5_handle_t* pstcHandle)
+{
+    uint8_t u8Temp;
+    en_result_t res;
+
+    AMX8X5_DEBUG_FUNC_START("Amx8x5_GetCentury");
+    //
+    // Get the century bit.
+    //
+    res = Amx8x5_ReadByte(pstcHandle,AMX8X5_REG_STATUS,&u8Temp);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(-1);
+    }
+    
+    return(u8Temp & AMX8X5_REG_STATUS_CB_MSK) ? 1 : 0;
+}
+
+/**
  ******************************************************************************
  ** \brief  This function is setting the time of the RTC
  **
@@ -1849,7 +2071,7 @@ en_result_t Amx8x5_SetOut1Mode(stc_amx8x5_handle_t* pstcHandle, en_amx8x5_out1_m
 
 /**
  ******************************************************************************
- ** \brief  ontrol and configuration signals for the flexible output PSW/nIRQ2
+ ** \brief  Control and configuration signals for the flexible output PSW/nIRQ2
  **
  ** see also #AMX8X5_REG_CONTROL_2 definition
  **
@@ -3318,6 +3540,129 @@ en_result_t Amx8x5_SetCountdown(stc_amx8x5_handle_t* pstcHandle, en_amx8x5_perio
 
 /**
  ******************************************************************************
+ ** \brief  Enable interrupt
+ **
+ ** see also #AMX8X5_REG_INT_MASK definition
+ **
+ ** \param  pstcHandle          RTC Handle
+ **
+ ** \param  u8IrqMask           Mask of interrupts to enable as defined in #AMX8X5_REG_INT_MASK
+ **
+ ** \return                     Ok on success, else the Error as en_result_t
+ **
+ ******************************************************************************/
+en_result_t Amx8x5_EnableInterrupt(stc_amx8x5_handle_t* pstcHandle, uint8_t u8IrqMask)
+{
+    en_result_t res;
+    AMX8X5_DEBUG_FUNC_START("Amx8x5_EnableInterrupt");
+    res = Amx8x5_SetRegister(pstcHandle,AMX8X5_REG_INT_MASK,u8IrqMask);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(res);
+    }
+    return AMX8X5_FUNC_END(Ok);
+}
+
+/**
+ ******************************************************************************
+ ** \brief  Disable interrupt
+ **
+ ** see also #AMX8X5_REG_INT_MASK definition
+ **
+ ** \param  pstcHandle          RTC Handle
+ **
+ ** \param  u8IrqMask           Mask of interrupts to disable as defined in #AMX8X5_REG_INT_MASK
+ **
+ ** \return                     Ok on success, else the Error as en_result_t
+ **
+ ******************************************************************************/
+en_result_t Amx8x5_DisableInterrupt(stc_amx8x5_handle_t* pstcHandle, uint8_t u8IrqMask)
+{
+    en_result_t res;
+    res = Amx8x5_ClearRegister(pstcHandle,AMX8X5_REG_INT_MASK,u8IrqMask);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(res);
+    }
+    return AMX8X5_FUNC_END(Ok);
+}
+
+/**
+ ******************************************************************************
+ ** \brief  Clear all interrupts
+ **
+ ** see also #AMX8X5_REG_STATUS definition
+ **
+ ** \param  pstcHandle          RTC Handle
+ **
+ ** \return                     Ok on success, else the Error as en_result_t
+ **
+ ******************************************************************************/
+en_result_t Amx8x5_ClearInterrupts(stc_amx8x5_handle_t* pstcHandle)
+{
+    en_result_t res;
+    res = Amx8x5_ClearRegister(pstcHandle,AMX8X5_REG_STATUS,0xFF);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(res);
+    }
+    return AMX8X5_FUNC_END(Ok);
+}
+
+/**
+ ******************************************************************************
+ ** \brief  Clear all interrupts
+ **
+ ** see also #AMX8X5_REG_STATUS definition
+ **
+ ** \param  pstcHandle          RTC Handle
+ **
+ ** \param  u8IrqMask           Mask of interrupts to clear as defined in #AMX8X5_REG_STATUS
+ **
+ ** \return                     Ok on success, else the Error as en_result_t
+ **
+ ******************************************************************************/
+en_result_t Amx8x5_ClearInterrupt(stc_amx8x5_handle_t* pstcHandle,uint8_t u8IrqMask)
+{
+    en_result_t res;
+    res = Amx8x5_ClearRegister(pstcHandle,AMX8X5_REG_STATUS,u8IrqMask);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(res);
+    }
+    return AMX8X5_FUNC_END(Ok);
+}
+
+/**
+ ******************************************************************************
+ ** \brief  Get status of pending interrupts
+ **
+ ** see also #AMX8X5_REG_STATUS definition
+ **
+ ** \param  pstcHandle          RTC Handle
+ **
+ ** \param  pu8Status           pointer to data byte to write the status mask as defined in #AMX8X5_REG_STATUS
+ **
+ ** \return                     Ok on success, else the Error as en_result_t
+ **
+ ******************************************************************************/
+en_result_t Amx8x5_GetInterruptStatus(stc_amx8x5_handle_t* pstcHandle, uint8_t* pu8Status)
+{
+    en_result_t res;
+    if (pu8Status == NULL)
+    {
+        return AMX8X5_FUNC_END(Error);
+    }
+    res = Amx8x5_ReadByte(pstcHandle,AMX8X5_REG_STATUS,pu8Status);
+    if (res != Ok) 
+    {
+        return AMX8X5_FUNC_END(res);
+    }
+    return AMX8X5_FUNC_END(Ok);
+}
+
+/**
+ ******************************************************************************
  ** \brief  Gets the extension address for the AMx8x5.
  **
  ** see also #AMX8X5_REG_EXTENDED_ADDR definition
@@ -3544,242 +3889,905 @@ en_result_t Amx8x5_RamWrite(stc_amx8x5_handle_t* pstcHandle, uint8_t u8Address, 
         return true;
     }
 
+    /**
+     ******************************************************************************
+     ** \brief  This function is reset the RTC
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::reset(void){
         return Amx8x5_Reset(&stcRtcConfig);
     }
 
+    /**
+     ******************************************************************************
+     ** \brief  This function is getting the time of the RTC
+     **
+     ** \param  ppstcTime      returns the pointer of the time structure stc_amx8x5_time_t in a pointer of the pointer
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     **
+     ** Example:
+     ** @code
+     ** AMx8x5::stcTime* pstcTime;
+     **
+     ** rtc.getTime(&stcRtcConfig,&pstcTime);
+     **
+     ** printf("It is: %d:%d:%d \r\n",pstcTime->u8Hour,pstcTime->u8Minute,pstcTime->u8Second);
+     ** @endcode
+     ** 
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::getTime(AMx8x5::stcTime** ppstcTime)
     {
         return Amx8x5_GetTime(&stcRtcConfig,ppstcTime);
     }
 
+    /**
+     ** @brief Get Time - Hundredth
+     ** 
+     ** @return int16_t the value, -1 on error
+     **/
     int16_t AMx8x5::getHundredth(void)
     {
         return Amx8x5_GetHundredth(&stcRtcConfig);
     }
-
+    /**
+     ** @brief Get Time - Second
+     ** 
+     ** @return int16_t the value, -1 on error
+     **/
     int16_t AMx8x5::getSecond(void)
     {
         return Amx8x5_GetSecond(&stcRtcConfig);
     }
 
+    /**
+     ** @brief Get Time - Minute
+     ** 
+     ** @return int16_t the value, -1 on error
+     **/
     int16_t AMx8x5::getMinute(void)
     {
         return Amx8x5_GetMinute(&stcRtcConfig);
     }
 
+    /**
+     ** @brief Get Time - Hour
+     ** 
+     ** @return int16_t the value, -1 on error
+     **/
     int16_t AMx8x5::getHour(void)
     {
         return Amx8x5_GetHour(&stcRtcConfig);
     }
 
+    /**
+     ** @brief Get Time - Day
+     ** 
+     ** @return int16_t the value, -1 on error
+     **/
     int16_t AMx8x5::getDay(void)
     {
         return Amx8x5_GetDay(&stcRtcConfig);
     }
 
+    /**
+     ** @brief Get Time - Weekday
+     ** 
+     ** @return int16_t the value, -1 on error
+     **/
     int16_t AMx8x5::getWeekday(void)
     {
         return Amx8x5_GetWeekday(&stcRtcConfig);
     }
 
+    /**
+     ** @brief Get Time - Month
+     ** 
+     ** @return int16_t the value, -1 on error
+     **/
     int16_t AMx8x5::getMonth(void)
     {
         return Amx8x5_GetMonth(&stcRtcConfig);
     }
 
+    /**
+     ** @brief Get Time - Year
+     ** 
+     ** @return int16_t the value, -1 on error
+     **/
     int16_t AMx8x5::getYear(void)
     {
         return Amx8x5_GetYear(&stcRtcConfig);
     }
 
-
-
+    /**
+     ******************************************************************************
+     ** \brief  This function is setting the time of the RTC
+     **
+     ** \param  pstcTime       pointer of the new time stc_amx8x5_time_t to write
+     **
+     ** \param  bProtect       false to leave counters writable, true to leave counters unwritable
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::setTime(AMx8x5::stcTime* pstcTime, bool bProtect)
     {
         return Amx8x5_SetTime(&stcRtcConfig,pstcTime,bProtect);
     }
 
+    /**
+     ******************************************************************************
+     ** \brief  Set the calibration.
+     **
+     ** This function loads the AMX8XX counter registers with the last read
+     ** values of Amx8x5_GetTime()
+     **
+     ** \param  enMode         AMx8x5ModeCalibrateXT calibrate the XT oscillator or AMx8x5ModeCalibrateRC calibrate the RC oscillator
+     **
+     ** \param   iAdjust: Adjustment in ppm. 
+     **          Adjustment limits are:
+     **              enMode = AMx8x5ModeCalibrateXT => (-610 to +242)
+     **              enMode = AMx8x5ModeCalibrateRC => (-65536 to +65520)
+     **              An iAdjust value of zero resets the selected oscillator calibration
+     **              value to 0.
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** enMode(&stcRtcConfig,AMx8x5ModeCalibrateXT,5);
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::setCalibrationValue(AMx8x5::enCalibrationMode enMode, int32_t iAdjust)
     {
         return Amx8x5_SetCalibrationValue(&stcRtcConfig,enMode,iAdjust);
     }
 
+    /**
+     ******************************************************************************
+     ** \brief  Set the alarm value
+     **
+     ** This function sets the alarm value and configures the correct pin (if
+     ** necessary).
+     **
+     ** \param  pstcTime       Time
+     **
+     ** \param enModeRepeat   Repeat mode as defined in #en_amx8x5_alarm_repeat_t
+     **        AMx8x5AlarmDisabled => disable alarm
+     **        AMx8x5AlarmYear => once per year
+     **        AMx8x5AlarmMonth => once per month
+     **        AMx8x5AlarmWeek => once per week
+     **        AMx8x5AlarmDay => once per day
+     **        AMx8x5AlarmHour => once per hour
+     **        AMx8x5AlarmMinute => once per minute
+     **        AMx8x5AlarmSecond => once per second
+     **        AMx8x5Alarm10thSecond => once per 10th of a second
+     **        AMx8x5Alarm100thSecond => once per 100th of a second
+     **        NOTE: year and century are not used
+     **        NOTE: mode must match current 12/24 selection
+     **
+     ** \param enModeIrq       Interrupt mode as defined in #en_amx8x5_interrupt_mode_t
+     **        AMx8x5InterruptModeLevel => Level (static) for both XT mode and RC mode.
+     **        AMx8x5InterruptModePulseShort => 1/8192 seconds pulse for XT mode. 1/64 seconds for RC mode.
+     **        AMx8x5InterruptModePulseMedium => 1/64 seconds pulse for both XT mode and RC mode
+     **        AMx8x5InterruptModePulseLong => 1/4 seconds pulse for both XT mode and RC mode.
+     **
+     ** \param enModePin pin on which to generate the interrupt as defined in #en_amx8x5_interrupt_pin_t
+     **        AMx8x5InterruptPinInternal => internal flag only
+     **        AMx8x5InterruptIrq => FOUT/nIRQ
+     **        AMx8x5InterruptIrq2 => PSW/nIRQ2
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::setAlarm(AMx8x5::stcTime* pstcTime, AMx8x5::enAlarmRepeat enModeRepeat, AMx8x5::enInterruptMode enModeIrq, AMx8x5::enInterruptPin enModePin)
     {
         return Amx8x5_SetAlarm(&stcRtcConfig,pstcTime,enModeRepeat,enModeIrq,enModePin);
     }
 
+    /**
+     ******************************************************************************
+     ** \brief  This function is stopping / releasing stop of the RTC
+     **
+     ** Dets the STOP bit in the Control1 register, 
+     ** see also #AMX8X5_REG_CONTROL_1 definition
+     **
+     ** \param  bStop          true to stop, false to release stop
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_Stop(&stcRtcConfig,true); //stop the RTC
+     **
+     ** Amx8x5_Stop(&stcRtcConfig,false); //release stop for the RTC
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::stop(bool bStop)
     {
         return Amx8x5_Stop(&stcRtcConfig,bStop);
     }
 
+    /**
+     ******************************************************************************
+     ** \brief  This function controlling a static value which may be driven 
+     **         on the PSW/nIRQ2 pin
+     **
+     ** The OUTB bit cannot be set to 1 if the @link AMX8X5_REG_OSC_STATUS LKO2 bit @endlink 
+     ** is 1. see also #AMX8X5_REG_OSC_STATUS for LKO2.
+     **
+     ** Sets the OUTB bit in the Control1 register, 
+     ** see also #AMX8X5_REG_CONTROL_1 definition
+     **
+     ** \param  bOnOff          true for ON, false for OFF
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_CtrlOutB(&stcRtcConfig,true);  //set PSW/nIRQ2 pin on
+     **                                       //(The OUTB bit cannot be set to 1 if the LKO2 bit is 1)
+     **
+     ** Amx8x5_CtrlOutB(&stcRtcConfig,false); //set PSW/nIRQ2 pin off
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::ctrlOutB(bool bOnOff)
     {
         return Amx8x5_CtrlOutB(&stcRtcConfig,bOnOff);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  This function controlling a static value which may be driven 
+     **         on the FOUT/nIRQ pin
+     **
+     ** This bit also defines the default value for the Square Wave output 
+     ** when @link AMX8X5_REG_SQW SQWE @endlink is not asserted
+     **
+     ** Sets the OUT bit in the Control1 register, see also #AMX8X5_REG_CONTROL_1 definition
+     **
+     ** \param  bOnOff         true for ON, false for OFF
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_CtrlOut(&stcRtcConfig,true);  //set FOUT/nIRQ pin on
+     **
+     ** Amx8x5_CtrlOut(&stcRtcConfig,false); //setFOUT/nIRQ pin off
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::ctrlOut(bool bOnOff)
     {
         return Amx8x5_CtrlOut(&stcRtcConfig,bOnOff);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  Reset Polarity.
+     **
+     ** see also #AMX8X5_REG_CONTROL_1 definition
+     **
+     ** \param  bAssertHigh    Reset Polarity. When true, the nRST pin is asserted high. When false, the nRST pin is asserted low.
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_SetResetPolarity(&stcRtcConfig,true);  //nRST pin is asserted high
+     **
+     ** Amx8x5_SetResetPolarity(&stcRtcConfig,false);  //the nRST pin is asserted low
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::setResetPolarity(bool bAssertHigh)
     {
         return Amx8x5_SetResetPolarity(&stcRtcConfig,bAssertHigh);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  Auto reset enable.
+     **
+     ** see also #AMX8X5_REG_CONTROL_1 definition
+     **
+     ** \param  bEnabled       When true, a read of the Status register will cause any interrupt bits (TIM, BL,
+     **                        ALM, WDT, XT1, XT2) to be cleared. When false, the bits must be explicitly cleared by writing the
+     **                        Status register.
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_AutoResetStatus(&stcRtcConfig,true);  //Enable auto reset
+     **
+     ** Amx8x5_AutoResetStatus(&stcRtcConfig,false);  //Disable auto reset
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::autoResetStatus(bool bEnabled)
     {
         return Amx8x5_AutoResetStatus(&stcRtcConfig,bEnabled);
     }
+
+
+    /**
+     ******************************************************************************
+     ** \brief  PSW/nIRQ2 Feature (only available at AM18X5)
+     **
+     ** see also #AMX8X5_REG_CONTROL_1 definition
+     **
+     ** \param  bEnabled       When true, the PSW/nIRQ2 pin is driven by an approximately 1 Ohm pull-down which allows the
+     **                        AM18X5 to switch power to other system devices through this pin. When false, the PSW/nIRQ2pin
+     **                        is a normal open drain output.
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_SetPswHighCurrent(&stcRtcConfig,true);  //Enable high current PSW
+     **
+     ** Amx8x5_SetPswHighCurrent(&stcRtcConfig,false);  //Disable the high current PSW
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::setPswHighCurrent(bool bEnabled)
     {
         return Amx8x5_SetPswHighCurrent(&stcRtcConfig,bEnabled);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  nEXTR pin to generate nRST.
+     **
+     ** see also #AMX8X5_REG_CONTROL_2 definition
+     **
+     ** \param  bEnabled       When true, enable the nEXTR pin to generate nRST.
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_UsenExtrAsReset(&stcRtcConfig,true);  //Enable the nEXTR pin to generate nRST
+     **
+     ** Amx8x5_UsenExtrAsReset(&stcRtcConfig,false);  //Disable the nEXTR pin to generate nRST
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::usenExtrAsReset(bool bEnabled)
     {
         return Amx8x5_UsenExtrAsReset(&stcRtcConfig,bEnabled);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  Control and configuration signals for the flexible output FOUT/nIRQ
+     **
+     ** see also #AMX8X5_REG_CONTROL_2 definition
+     **
+     ** \param  enMode         Mode, see also en_amx8x5_out1_mode_t
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_SetOut2Mode(&stcRtcConfig,AMx8x5Out1nIRQAtIrqElseOut);  //nIRQ if at least one interrupt is enabled, else OUT
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::setOut1Mode(AMx8x5::enOut1Mode enMode)
     {
         return Amx8x5_SetOut1Mode(&stcRtcConfig,enMode);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  Control and configuration signals for the flexible output PSW/nIRQ2
+     **
+     ** see also #AMX8X5_REG_CONTROL_2 definition
+     **
+     ** \param  enMode         Mode, see also en_amx8x5_out2_mode_t
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_SetOut2Mode(&stcRtcConfig,AMx8x5Out2Sleep);  //Set OUT2 mode sleep
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::setOut2Mode(AMx8x5::enOut2Mode enMode)
     {
         return Amx8x5_SetOut2Mode(&stcRtcConfig,enMode);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  XT1 Interrupt Enable.
+     **
+     ** see also #AMX8X5_REG_INT_MASK definition
+     **
+     ** \param  bEnabled       true: The WDI input pin will generate the XT1 interrupt when the edge specified by EX1P occurs.
+     **                        false: Disable the XT2 interrupt.
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_EnableIrqXt1OnExti(&stcRtcConfig,true);  //Enable the XT1 interrupt.
+     **
+     ** Amx8x5_EnableIrqXt1OnExti(&stcRtcConfig,false); //Disable the XT1 interrupt.
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::enableIrqXt1OnExti(bool bEnabled)
     {
         return Amx8x5_EnableIrqXt1OnExti(&stcRtcConfig,bEnabled);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  XT2 Interrupt Enable.
+     **
+     ** see also #AMX8X5_REG_INT_MASK definition
+     **
+     ** \param  bEnabled       true: The WDI input pin will generate the XT2 interrupt when the edge specified by EX2P occurs.
+     **                        false: Disable the XT2 interrupt.
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_EnableIrqXt2OnWdi(&stcRtcConfig,true);  //Enable the XT2 interrupt.
+     **
+     ** Amx8x5_EnableIrqXt2OnWdi(&stcRtcConfig,false); //Disable the XT2 interrupt.
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::enableIrqXt2OnWdi(bool bEnabled)
     {
         return Amx8x5_EnableIrqXt2OnWdi(&stcRtcConfig,bEnabled);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  Alarm Interrupt Enable.
+     **
+     ** see also #AMX8X5_REG_INT_MASK definition
+     **
+     ** \param  bEnabled       true: A match of all the enabled alarm registers will generate an IRQ interrupt signal. 
+     **                        false: Disable the alarm interrupt.
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_EnableIrqAlarm(&stcRtcConfig,true);  //set Alarm Interrupt
+     **
+     ** Amx8x5_EnableIrqAlarm(&stcRtcConfig,false); //clear Alarm Interrupt
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::enableIrqAlarm(bool bEnabled)
     {
         return Amx8x5_EnableIrqAlarm(&stcRtcConfig,bEnabled);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  Timer Interrupt Enable.
+     **
+     ** see also #AMX8X5_REG_INT_MASK definition
+     **
+     ** \param  bEnabled       true: The Countdown Timer will generate an IRQ interrupt signal 
+     **                        and set the TIM flag when the timer reaches 0.
+     **                        false: Disable the timer interrupt.
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_EnableIrqTimer(&stcRtcConfig,true);  //set Timer Interrupt
+     **
+     ** Amx8x5_EnableIrqTimer(&stcRtcConfig,false); //clear Timer Interrupt
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::enableIrqTimer(bool bEnabled)
     {
         return Amx8x5_EnableIrqTimer(&stcRtcConfig,bEnabled);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  Battery Low Interrupt Enable.
+     **
+     ** see also #AMX8X5_REG_INT_MASK definition
+     **
+     ** \param  bEnabled       true for enable, false for disable
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_EnableIrqBatteryLow(&stcRtcConfig,true);  //set Battery Low Interrupt
+     **
+     ** Amx8x5_EnableIrqBatteryLow(&stcRtcConfig,false); //clear Battery Low Interrupt
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::enableIrqBatteryLow(bool bEnabled)
     {
         return Amx8x5_EnableIrqBatteryLow(&stcRtcConfig,bEnabled);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  This function is controlling the behavior of the I/O pins under 
+     **         various power down conditions.
+     **
+     ** see also #AMX8X5_REG_OCTRL definition
+     **
+     ** \param  u8OutputMask   Mask of outputs to enable / disable as defined in #AMX8X5_REG_OCTRL
+     **
+     ** \param  bEnable        1 for enable, 0 for disable
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ** Example:
+     ** @code
+     ** Amx8x5_EnableOutput(&stcRtcConfig,AMX8X5_REG_OCTRL_O1EN_MSK,true);  //set FOUT/nIRQ as output
+     **
+     ** Amx8x5_EnableOutput(&stcRtcConfig,AMX8X5_REG_OCTRL_O1EN_MSK,false); //dont use FOUT/nIRQ as output
+     ** @endcode
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::enableTrickleCharger(AMx8x5::enTrickleDiode enDiode, AMx8x5::enTrickleResistor enResistor, bool bEnabled)
     {
         return Amx8x5_EnableTrickleCharger(&stcRtcConfig,enDiode,enResistor,bEnabled);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  This function controls the Trickle Charger
+     **
+     ** see also #AMX8X5_REG_TRICKLE definition
+     **
+     ** \param  pstcHandle     RTC Handle
+     **
+     ** \param  enDiode        Diode Select.
+     **                        AMx8x5TrickleDiodeDisabled => disable the Trickle Charger.
+     **                        AMx8x5TrickleDiodeSchottky => inserts a schottky diode into the trickle charge circuit, with a voltage drop of 0.3V
+     **                        AMx8x5TrickleDiodeNormal => inserts a standard diode into the trickle charge circuit, with a voltage drop of 0.6V
+     ** 
+     ** \param  enResistor     Output Resistor.
+     **
+     ** \param  bEnable        true for enable, false for disable
+     **                        AMx8x5TrickleResistorDisabled = 0> disable the Trickle Charger.
+     **                        AMx8x5TrickleResistor3K => this selects 3K Ohm as the output resistor of the trickle charge circuit
+     **                        AMx8x5TrickleResistor6K => this selects 6K Ohm as the output resistor of the trickle charge circuit
+     **                        AMx8x5TrickleResistor11K => this selects 11K Ohm as the output resistor of the trickle charge circuit
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::setBatteryReferenceVoltage(AMx8x5::enBatReference enBref)
     {
         return Amx8x5_SetBatteryReferenceVoltage(&stcRtcConfig,enBref);
     }
 
+
+    AMx8x5::enResult AMx8x5::enableInterrupt(uint8_t u8IrqMask)
+    {
+        return Amx8x5_EnableInterrupt(&stcRtcConfig,u8IrqMask);
+    }
+    AMx8x5::enResult AMx8x5::disableInterrupt(uint8_t u8IrqMask)
+    {
+        return Amx8x5_DisableInterrupt(&stcRtcConfig,u8IrqMask);
+    }
+    AMx8x5::enResult AMx8x5::clearInterrupts(void)
+    {
+        return Amx8x5_ClearInterrupts(&stcRtcConfig);
+    }
+    AMx8x5::enResult AMx8x5::clearInterrupt(uint8_t u8IrqMask)
+    {
+        return Amx8x5_ClearInterrupt(&stcRtcConfig,u8IrqMask);
+    }
+    AMx8x5::enResult AMx8x5::getInterruptStatus(uint8_t* pu8Status)
+    {
+        return Amx8x5_GetInterruptStatus(&stcRtcConfig,pu8Status);
+    }
+
+    /**
+     ******************************************************************************
+     ** \brief  Select an oscillator mode.
+     **
+     ** \param u32Period     timeout period in ms (65 to 124,000)
+     **
+     ** \param  enPin        pin to generate the watchdog signal
+     **                      AMx8x5WatchdogInterruptPinDisable => disable WDT
+     **                      AMx8x5WatchdogInterruptPinFOUTnIRQ => generate an interrupt on FOUT/nIRQ
+     **                      AMx8x5WatchdogInterruptPinPSWnIRQ2 => generate an interrupt on PSW/nIRQ2
+     **                      AMx8x5WatchdogInterruptPinnRST => generate a reset on nRST (AM18xx only)
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::setWatchdog(uint32_t u32Period, AMx8x5::enWatchdogInterruptPin enPin)
     {
         return Amx8x5_SetWatchdog(&stcRtcConfig,u32Period,enPin);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  Set up sleep mode (AM18x5 only)
+     **
+     ** \param  u8Timeout  minimum timeout period in 7.8 ms periods (0 to 7)
+     **
+     ** \param  enMode     sleep mode (nRST modes not available in AM08xx)
+     **                    AMx8x5nRstLowInSleep => nRST is pulled low in sleep mode
+     **                    AMx8x5PswIrq2HighInSleep =>  PSW/nIRQ2 is pulled high on a sleep
+     **                    AMx8x5nRstLoPswIrq2HighInSleep =>  nRST pulled low and PSW/nIRQ2 pulled high on sleep
+     **
+     ** \return Ok on sleep request accepted, sleep mode will be initiated in u8Timeout seconds, 
+     **         OperationInProgress on sleep request declined, interrupt is currently pending,
+     **         ErrorInvalidMode on sleep request declined, no sleep trigger interrupt enabled
+     ** 
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::setSleepMode(uint8_t ui8Timeout, AMx8x5::enSleepMode enMode)
     {
         return Amx8x5_SetSleepMode(&stcRtcConfig,ui8Timeout,enMode);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  Gets the extension address for the AMx8x5.
+     **
+     ** see also #AMX8X5_REG_EXTENDED_ADDR definition
+     **
+     ** \param  u8Address           Mask of outputs to enable / disable as defined in #AMX8X5_REG_OCTRL
+     **
+     ** \param  pu8ExtensionAddress returned pointer to externsion address
+     **
+     ** \return                     Ok on success, else the Error as en_result_t
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::getExtensionAddress(uint8_t u8Address, uint8_t* pu8ExtensionAddress)
     {
         return Amx8x5_GetExtensionAddress(&stcRtcConfig,u8Address,pu8ExtensionAddress);
     }
+
+    /**
+     ******************************************************************************
+     ** \brief  Configure and enable the square wave output.
+     **
+     ** see also #AMX8X5_REG_SQW definition.
+     **
+     ** \param  u8SQFS         square wave output select (0 to 31) as defined in SQFS in #AMX8X5_REG_SQW
+     **
+     ** \param  u8PinMsk       output pin for SQW (may be ORed) in addition to CLKOUT
+     **                        0 => disable SQW
+     **                        1 => FOUT
+     **                        2 => PSW/nIRQ2
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::setSquareWaveOutput(uint8_t u8SQFS, uint8_t u8PinMsk)
     {
         return Amx8x5_SetSquareWaveOutput(&stcRtcConfig,u8SQFS,u8PinMsk);
     }
 
+    /**
+     ******************************************************************************
+     ** \brief  Select an oscillator mode.
+     **
+     ** \param  enSelect     the oscillator to select
+     **                      AMx8x5Xt32KHzNoSwitch => 32 KHz XT oscillator, no automatic oscillator switching
+     **                      AMx8x5Xt32KHzSwitchRcOnBat => 32 KHz XT oscillator, automatic oscillator switching to RC on
+     **                           switch to battery power
+     **                      AMx8x5nRc128Hz => 128 Hz RC oscillator
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::selectOscillatorMode(AMx8x5::enOscSelect enSelect)
     {
         return Amx8x5_SelectOscillatorMode(&stcRtcConfig,enSelect);
     }
 
+    /**
+     ******************************************************************************
+     ** \brief  Configure and set the countdown.
+     **
+     ** \param  enRange        AMx8x5PeriodeUs => iPeriod in us, AMx8x5PeriodeSeconds => iPeriod in seconds
+     **
+     ** \param  iPeriod        the iPeriod of the countdown timer.
+     **   
+     ** \param  enRepeat       Configure the interrupt output type:
+     **                        AMx8x5RepeatModeSingleLevel => generate a single level interrupt
+     **                        AMx8x5RepeatModeRepeatedPulseShort => generate a repeated pulsed interrupt, 1/4096 s (XT mode), 1/128 s (RC mode), en8Range must be AMx8x5PeriodeUs
+     **                        AMx8x5RepeatModeSinglePulseShort => generate a single pulsed interrupt, 1/4096 s (XT mode), 1/128 s (RC mode), en8Range must be AMx8x5PeriodeUs
+     **                        AMx8x5RepeatModeRepeatedPulseMedium => generate a repeated pulsed interrupt, 1/128 s, en8Range must be AMx8x5PeriodeUs
+     **                        AMx8x5RepeatModeSinglePulseMedium => generate a single pulsed interrupt, 1/128 s, en8Range must be AMx8x5PeriodeUs
+     **                        AMx8x5RepeatModeRepeatedPulseLong => generate a repeated pulsed interrupt, 1/64 s, en8Range must be AMx8x5PeriodeSeconds
+     **                        AMx8x5RepeatModeSinglePulseLong => generate a single pulsed interrupt, 1/64 s, en8Range must be AMx8x5PeriodeSeconds
+     **
+     ** \param enPin           Select the pin to generate a countdown interrupt:
+     **                        AMx8x5CountdownInterruptPinDisable => disable the countdown timer
+     **                        AMx8x5CountdownInterruptPinnTIRQLow =>generate an interrupt on nTIRQ only, asserted low
+     **                        AMx8x5CountdownInterruptPinFOUTnIRQLownTIRQLow => generate an interrupt on FOUT/nIRQ and nTIRQ, both asserted low
+     **                        AMx8x5CountdownInterruptPinPSWnIRQ2LownTIRQLow => generate an interrupt on PSW/nIRQ2 and nTIRQ, both asserted low
+     **                        AMx8x5CountdownInterruptPinCLKOUTnIRQ3LownTIRQLow => generate an interrupt on CLKOUT/nIRQ3 and nTIRQ, both asserted low
+     **                        AMx8x5CountdownInterruptPinCLKOUTnIRQ3HighnTIRQLow => generate an interrupt on CLKOUT/nIRQ3 (asserted high) and nTIRQ (asserted low)    
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::setCountdown(AMx8x5::enPeriodeRange enRange, int32_t iPeriod, AMx8x5::enCountdownInterruptOutput enRepeat, AMx8x5::enCountdownInterruptPin enPin)
     {
         return Amx8x5_SetCountdown(&stcRtcConfig,enRange,iPeriod,enRepeat,enPin);
     }
 
-    /// @brief Set autocalibration
-    /// @param enPeriod period of autocalibration
-    /// @return Result
+    /**
+     ******************************************************************************
+     ** \brief  Set up autocalibration.
+     **
+     ** \param  enPeriod       the repeat period for autocalibration.
+     **                        AMx8x5AutoCalibrationPeriodDisable => disable autocalibration
+     **                        AMx8x5AutoCalibrationPeriodSingleCycle => execute a single autocalibration cycle
+     **                        AMx8x5AutoCalibrationPeriodCycleSecods1024 => execute a cycle every 1024 seconds (~17 minutes)
+     **                        AMx8x5AutoCalibrationPeriodCycleSecods512 => execute a cycle every 512 seconds (~8.5 minutes)
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::setAutocalibration(AMx8x5::enAutocalibrationPeriod enPeriod)
     {
         return Amx8x5_SetAutocalibration(&stcRtcConfig,enPeriod);
     }
 
-    /// @brief Read data from RTC-RAM
-    /// @param u8Address Address in RAM
-    /// @param u8Data Pointert to data byte
-    /// @return Result
+    /**
+     ******************************************************************************
+     ** \brief  Read a byte from the local AMX8X5 RAM.
+     **
+     ** \param  u8Address      RTC RAM address.
+     **
+     ** \param  pu8Data        Data Byte returned
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::ramRead(uint8_t u8Address, uint8_t* pu8Data)
     {
         return Amx8x5_RamRead(&stcRtcConfig,u8Address, pu8Data);
     }
 
-    /// @brief Write data to RTC-RAM
-    /// @param u8Address Address in RAM
-    /// @param u8Data Data byte
-    /// @return Result
+    /**
+     ******************************************************************************
+     ** \brief  Write a byte to the local AMX8X5 RAM.
+     **
+     ** \param  u8Address      RTC RAM address.
+     **
+     ** \param  u8Data         Data Byte
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     **
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::ramWrite(uint8_t u8Address, uint8_t u8Data)
     {
         return Amx8x5_RamWrite(&stcRtcConfig,u8Address,u8Data);
     }
 
-    /// @brief Clear Register
-    /// @param u8Address Register address
-    /// @param u8Mask Bitmask
-    /// @return Result
+    /**
+     ******************************************************************************
+     ** \brief  Clear bits in register
+     **
+     ** \param u8Address       Register address
+     **
+     ** \param u8Mask          Bitmask
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::clearRegister(uint8_t u8Address, uint8_t u8Mask)
     {
         return Amx8x5_ClearRegister(&stcRtcConfig,u8Address,u8Mask);
     }
 
-    /// @brief Set Register
-    /// @param u8Address Register address
-    /// @param u8Mask Bitmask
-    /// @return Result
+    /**
+     ******************************************************************************
+     ** \brief  Set bits in register
+     **
+     ** \param u8Address       Register address
+     **
+     ** \param u8Mask          Bitmask
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::setRegister(uint8_t u8Address, uint8_t u8Mask)
     {
         return Amx8x5_SetRegister(&stcRtcConfig,u8Address,u8Mask);
     }
 
-    /// @brief Read byte from RTC
-    /// @param u8Register Register
-    /// @param pu8Value Pointer to data
-    /// @return Result
+    /**
+     ******************************************************************************
+     ** \brief  Read one byte
+     **
+     ** \param u8Register      Register address
+     **
+     ** \param pu8Value        Data pointer to store the data
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::readByte(uint8_t u8Register, uint8_t* pu8Value)
     {
        return Amx8x5_ReadByte(&stcRtcConfig,u8Register,pu8Value);
     }
 
-    /// @brief Read bytes from RTC
-    /// @param u8Register Register
-    /// @param pu8Data Pointer to data
-    /// @param u32Length  Length of data
-    /// @return Result
+    /**
+     ******************************************************************************
+     ** \brief  Read multiple bytes
+     **
+     ** \param u8Register      Register address
+     **
+     ** \param pu8Data         Data pointer to store the data
+     **
+     ** \param u32Length       Data length
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::readBytes(uint8_t u8Register, uint8_t* pu8Data, uint32_t u32Length)
     {
         return Amx8x5_ReadBytes(&stcRtcConfig,u8Register,pu8Data,u32Length);
     }
 
-    /// @brief Write byte to RTC
-    /// @param u8Register Register
-    /// @param u8Value Data byte
-    /// @return Result
+    /**
+     ******************************************************************************
+     ** \brief  Write one byte
+     **
+     ** \param  u8Register     Register address
+     **
+     ** \param u8Value         Value to write
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::writeByte(uint8_t u8Register, uint8_t u8Value)
     {
         return Amx8x5_WriteByte(&stcRtcConfig,u8Register, u8Value);
     }
 
-    /// @brief Write bytes to RTC
-    /// @param u8Register Register
-    /// @param pu8Data Pointer to data
-    /// @param u32Length  Length of data
-    /// @return Result
+    /**
+     ******************************************************************************
+     ** \brief  Write multiple bytes
+     **
+     ** \param u8Register      Register address
+     **
+     ** \param pu8Data         Data pointer
+     **
+     ** \param u32Length       Data length
+     **
+     ** \return Ok on success, else the Error as en_result_t
+     ** 
+     ******************************************************************************/
     AMx8x5::enResult  AMx8x5::writeBytes(uint8_t u8Register, uint8_t* pu8Data, uint32_t u32Length)
     {
         return Amx8x5_WriteBytes(&stcRtcConfig,u8Register, pu8Data,u32Length);
