@@ -1756,7 +1756,7 @@
 #define AMX8X5_REG_OSC_CONTROL_OFIE_POS      (1)
 #define AMX8X5_REG_OSC_CONTROL_OFIE_MSK      (1 << AMX8X5_REG_OSC_CONTROL_OFIE_POS)
 #define AMX8X5_REG_OSC_CONTROL_ACIE_POS      (0)
-#define AMX8X5_REG_OSC_CONTROL_ACIE_MSK      (0 << AMX8X5_REG_OSC_CONTROL_ACIE_POS)
+#define AMX8X5_REG_OSC_CONTROL_ACIE_MSK      (1 << AMX8X5_REG_OSC_CONTROL_ACIE_POS)
 
 //@}
     
@@ -2113,7 +2113,9 @@
 //@} // amx8x5_register_definitions
     
 // Keys.
-#define AMX8X5_CONFIG_KEY_VAL            0xA1 ///<configuration key value
+#define AMX8X5_CONFIG_KEY_VAL            0xA1 ///<configuration key value (for Oscillator Control register)
+#define AMX8X5_REG_CONFIG_KEY_VAL_OSC    0xA1 ///<configuration key to unlock Oscillator Control register (0x1C)
+#define AMX8X5_REG_CONFIG_KEY_VAL_OTHER  0x9D ///<configuration key to unlock Trickle, BREF, AFCTRL, BATMODE IO registers
 
 // Modes
 #define AMX8X5_12HR_MODE                 0x01 ///<12h mode value
@@ -2323,20 +2325,41 @@ typedef enum en_amx8x5_communication_mode
  ******************************************************************************
  ** \brief RTC type
  **
- ** used to set the type of used RTC (with/without power management)
+ ** Identifies the physical device variant and implicitly selects the bus
+ ** interface (I2C or SPI).
+ **
+ ** The communication mode is encoded in bit 4 (0x0010) of the enum value:
+ **   - Bit 4 = 0  ->  I2C  (part numbers x0805 / x1805, e.g. AM0805, AM1805)
+ **   - Bit 4 = 1  ->  SPI  (part numbers x0815 / x1815, e.g. AM0815, AM1815)
+ **
+ ** The upper nibble encodes the power-management capability:
+ **   - Upper nibble = 0  ->  no power management (AM08xx / AB08xx)
+ **   - Upper nibble = 1  ->  with power management / PSW output (AM18xx / AB18xx / RV-1805-C3)
+ **
+ ** Part-number to interface mapping:
+ ** | Enum value                    | Part numbers              | Interface | Power mgmt |
+ ** |-------------------------------|---------------------------|-----------|------------|
+ ** | AMx8x5Type0805 (0x0805)       | AM0805AQ, AB0805          | I2C       | no         |
+ ** | AMx8x5Type0815 (0x0815)       | AM0815AQ, AB0815          | SPI       | no         |
+ ** | AMx8x5Type1805 (0x1805)       | AM1805AQ, AB1805, RV-1805 | I2C       | yes        |
+ ** | AMx8x5Type1815 (0x1815)       | AM1815AQ, AB1815          | SPI       | yes        |
+ **
+ ** The #AMx8x5 constructor uses the rule `(enType & 0x0010) != 0` to
+ ** automatically set #en_amx8x5_communication_mode_t to #AMx8x5ModeSPI or
+ ** #AMx8x5ModeI2C without requiring explicit configuration by the caller.
  **
  ******************************************************************************/
 typedef enum en_amx8x5_rtc_type
 {
-    AMx8x5Type0805 = 0x0805, ///< RTC type AM0805AQ without power management (I2C)
-    AMx8x5Type0815 = 0x0815, ///< RTC type AM0815AQ without power management (SPI)
-    AMx8x5Type1805 = 0x1805, ///< RTC type AM1805AQ with power management (I2C)
-    AMx8x5Type1815 = 0x1815,  ///< RTC type AM1815AQ with power management (SPI)
-    AMx8x5TypeI2C = 0x0805, ///< RTC type AM0805AQ without power management (I2C)
-    AMx8x5TypeSPI = 0x0815, ///< RTC type AM0815AQ without power management (SPI)
-    AMx8x5TypeRV1805 = 0x1805, ///< RTC type RV1805 with power management (I2C)
-    AMx8x5TypeI2CPowerManagement = 0x1805, ///< RTC type AM1805AQ with power management (I2C)
-    AMx8x5TypeSPIPowerManagement = 0x1815  ///< RTC type AM1815AQ with power management (SPI)
+    AMx8x5Type0805 = 0x0805, ///< AM0805AQ / AB0805  – no power mgmt, I2C (bit 4 = 0)
+    AMx8x5Type0815 = 0x0815, ///< AM0815AQ / AB0815  – no power mgmt, SPI (bit 4 = 1)
+    AMx8x5Type1805 = 0x1805, ///< AM1805AQ / AB1805 / RV-1805-C3 – power mgmt, I2C (bit 4 = 0)
+    AMx8x5Type1815 = 0x1815, ///< AM1815AQ / AB1815  – power mgmt, SPI (bit 4 = 1)
+    AMx8x5TypeI2C = 0x0805,  ///< Alias for #AMx8x5Type0805 (I2C, no power mgmt)
+    AMx8x5TypeSPI = 0x0815,  ///< Alias for #AMx8x5Type0815 (SPI, no power mgmt)
+    AMx8x5TypeRV1805 = 0x1805,              ///< Alias for #AMx8x5Type1805 (RV-1805-C3, I2C, power mgmt)
+    AMx8x5TypeI2CPowerManagement = 0x1805,  ///< Alias for #AMx8x5Type1805 (I2C, power mgmt)
+    AMx8x5TypeSPIPowerManagement = 0x1815   ///< Alias for #AMx8x5Type1815 (SPI, power mgmt)
 } en_amx8x5_rtc_type_t;
 
 /**
@@ -2826,6 +2849,10 @@ en_result_t Amx8x5_EnableIrqXt2OnWdi(stc_amx8x5_handle_t* pstcHandle, bool bEnab
 en_result_t Amx8x5_EnableIrqAlarm(stc_amx8x5_handle_t* pstcHandle, bool bEnabled);
 en_result_t Amx8x5_EnableIrqTimer(stc_amx8x5_handle_t* pstcHandle, bool bEnabled);
 en_result_t Amx8x5_EnableIrqBatteryLow(stc_amx8x5_handle_t* pstcHandle, bool bEnabled);
+en_result_t Amx8x5_EnableIrqOscillatorFail(stc_amx8x5_handle_t* pstcHandle, bool bEnabled);
+en_result_t Amx8x5_EnableIrqAutocalibFail(stc_amx8x5_handle_t* pstcHandle, bool bEnabled);
+en_result_t Amx8x5_GetAnalogStatus(stc_amx8x5_handle_t* pstcHandle, uint8_t* pu8Status);
+en_result_t Amx8x5_SetBatmodeIO(stc_amx8x5_handle_t* pstcHandle, bool bIoEnabled);
 en_result_t Amx8x5_EnableTrickleCharger(stc_amx8x5_handle_t* pstcHandle, en_amx8x5_trickle_diode_t enDiode, en_amx8x5_trickle_resistor_t enResistor, bool bEnable);
 en_result_t Amx8x5_SetBatteryReferenceVoltage(stc_amx8x5_handle_t* pstcHandle, en_amx8x5_bat_reference_t enBref);
 
@@ -2894,6 +2921,15 @@ class AMx8x5
         stcRtcConfig.u32Address = 0x69;
       }
 
+      /**
+       * @brief Construct with explicit RTC type.
+       *
+       * The communication interface is derived automatically from @p enType:
+       *   - bit 4 of the enum value (0x0010) set   -> SPI  (AM0815 / AM1815)
+       *   - bit 4 of the enum value (0x0010) clear  -> I2C  (AM0805 / AM1805)
+       *
+       * @param enType  Device variant, see #en_amx8x5_rtc_type_t.
+       */
       AMx8x5(AMx8x5::enRtcType enType)
       {
         if (enType & 0x0010)
@@ -2909,6 +2945,16 @@ class AMx8x5
         stcRtcConfig.u32Address = 0x69;
       }
 
+      /**
+       * @brief Construct with explicit RTC type and a user context pointer.
+       *
+       * Same interface-detection logic as AMx8x5(enRtcType): bit 4 of
+       * @p enType selects SPI (set) or I2C (clear).
+       *
+       * @param enType   Device variant, see #en_amx8x5_rtc_type_t.
+       * @param pHandle  Arbitrary user pointer forwarded to the I2C/SPI
+       *                 callbacks (may be NULL).
+       */
       AMx8x5(AMx8x5::enRtcType enType, void* pHandle)
       {
         if (enType & 0x0010)
@@ -2937,6 +2983,14 @@ class AMx8x5
       * @return whether success.
       */
       bool begin(void);
+      #if defined(AMX8X5_SPI_AVAILABLE) || defined(SPI_H) || defined(_SPI_H_INCLUDED) || defined(SPI_H_) || \
+          defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR) || \
+          defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32) || \
+          defined(ARDUINO_ARCH_STM32) || defined(ARDUINO_ARCH_NRF52) || \
+          defined(ARDUINO_ARCH_RP2040) || defined(ARDUINO_ARCH_MBED_RP2040) || \
+          (defined(SPI_INTERFACES_COUNT) && (SPI_INTERFACES_COUNT > 0))
+      bool begin(uint8_t u8CsPin); ///< SPI variant: initialise with Arduino SPI library; @p u8CsPin is the chip-select pin
+      #endif
 
       bool end(void);
 
@@ -2971,6 +3025,10 @@ class AMx8x5
       AMx8x5::enResult enableIrqAlarm(bool bEnabled);
       AMx8x5::enResult enableIrqTimer(bool bEnabled);
       AMx8x5::enResult enableIrqBatteryLow(bool bEnabled);
+      AMx8x5::enResult enableIrqOscillatorFail(bool bEnabled);
+      AMx8x5::enResult enableIrqAutocalibFail(bool bEnabled);
+      AMx8x5::enResult getAnalogStatus(uint8_t* pu8Status);
+      AMx8x5::enResult setBatmodeIO(bool bIoEnabled);
       AMx8x5::enResult enableTrickleCharger(AMx8x5::enTrickleDiode enDiode, AMx8x5::enTrickleResistor enResistor, bool bEnable);
       AMx8x5::enResult setBatteryReferenceVoltage(AMx8x5::enBatReference enBref);
 

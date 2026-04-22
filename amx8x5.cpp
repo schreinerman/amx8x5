@@ -2352,6 +2352,180 @@ en_result_t Amx8x5_EnableIrqBatteryLow(stc_amx8x5_handle_t* pstcHandle, bool bEn
 
 /**
  ******************************************************************************
+ ** \brief  Oscillator Fail Interrupt Enable.
+ **
+ ** see also #AMX8X5_REG_OSC_CONTROL definition
+ **
+ ** \param  pstcHandle     RTC Handle
+ **
+ ** \param  bEnabled       true: An oscillator failure will generate an IRQ signal.
+ **                        false: Disable the oscillator fail interrupt.
+ **
+ ** \return Ok on success, else the Error as en_result_t
+ **
+ ** Example:
+ ** @code
+ ** Amx8x5_EnableIrqOscillatorFail(&stcRtcConfig,true);  //enable Oscillator Fail Interrupt
+ **
+ ** Amx8x5_EnableIrqOscillatorFail(&stcRtcConfig,false); //disable Oscillator Fail Interrupt
+ ** @endcode
+ **
+ ******************************************************************************/
+en_result_t Amx8x5_EnableIrqOscillatorFail(stc_amx8x5_handle_t* pstcHandle, bool bEnabled)
+{
+    en_result_t res;
+    AMX8X5_DEBUG_FUNC_START("Amx8x5_EnableIrqOscillatorFail");
+
+    if (pstcHandle == NULL)
+    {
+        return AMX8X5_FUNC_END(ErrorUninitialized);
+    }
+
+    // The OSC_CONTROL register requires the Configuration Key 0xA1 to be written first
+    res = Amx8x5_WriteByte(pstcHandle, AMX8X5_REG_CONFIG_KEY, AMX8X5_REG_CONFIG_KEY_VAL_OSC);
+    if (res != Ok) return AMX8X5_FUNC_END(res);
+
+    if (true == bEnabled)
+    {
+        return AMX8X5_FUNC_END(Amx8x5_SetRegister(pstcHandle, AMX8X5_REG_OSC_CONTROL, AMX8X5_REG_OSC_CONTROL_OFIE_MSK));
+    } else
+    {
+        return AMX8X5_FUNC_END(Amx8x5_ClearRegister(pstcHandle, AMX8X5_REG_OSC_CONTROL, AMX8X5_REG_OSC_CONTROL_OFIE_MSK));
+    }
+}
+
+/**
+ ******************************************************************************
+ ** \brief  Autocalibration Fail Interrupt Enable.
+ **
+ ** see also #AMX8X5_REG_OSC_CONTROL definition
+ **
+ ** \param  pstcHandle     RTC Handle
+ **
+ ** \param  bEnabled       true: An autocalibration failure will generate an IRQ signal.
+ **                        false: Disable the autocalibration fail interrupt.
+ **
+ ** \return Ok on success, else the Error as en_result_t
+ **
+ ** Example:
+ ** @code
+ ** Amx8x5_EnableIrqAutocalibFail(&stcRtcConfig,true);  //enable Autocalibration Fail Interrupt
+ **
+ ** Amx8x5_EnableIrqAutocalibFail(&stcRtcConfig,false); //disable Autocalibration Fail Interrupt
+ ** @endcode
+ **
+ ******************************************************************************/
+en_result_t Amx8x5_EnableIrqAutocalibFail(stc_amx8x5_handle_t* pstcHandle, bool bEnabled)
+{
+    en_result_t res;
+    AMX8X5_DEBUG_FUNC_START("Amx8x5_EnableIrqAutocalibFail");
+
+    if (pstcHandle == NULL)
+    {
+        return AMX8X5_FUNC_END(ErrorUninitialized);
+    }
+
+    // The OSC_CONTROL register requires the Configuration Key 0xA1 to be written first
+    res = Amx8x5_WriteByte(pstcHandle, AMX8X5_REG_CONFIG_KEY, AMX8X5_REG_CONFIG_KEY_VAL_OSC);
+    if (res != Ok) return AMX8X5_FUNC_END(res);
+
+    if (true == bEnabled)
+    {
+        return AMX8X5_FUNC_END(Amx8x5_SetRegister(pstcHandle, AMX8X5_REG_OSC_CONTROL, AMX8X5_REG_OSC_CONTROL_ACIE_MSK));
+    } else
+    {
+        return AMX8X5_FUNC_END(Amx8x5_ClearRegister(pstcHandle, AMX8X5_REG_OSC_CONTROL, AMX8X5_REG_OSC_CONTROL_ACIE_MSK));
+    }
+}
+
+/**
+ ******************************************************************************
+ ** \brief  Read the Analog Status Register (ASTAT 0x2F).
+ **
+ ** This register holds eight status bits which indicate the voltage levels
+ ** of the VCC and VBAT power inputs.
+ **
+ ** see also #AMX8X5_REG_ASTAT definition
+ **
+ ** \param  pstcHandle     RTC Handle
+ **
+ ** \param  pu8Status      Pointer to store the analog status byte
+ **
+ ** \return Ok on success, else the Error as en_result_t
+ **
+ ** Example:
+ ** @code
+ ** uint8_t u8Status;
+ ** Amx8x5_GetAnalogStatus(&stcRtcConfig, &u8Status);
+ ** @endcode
+ **
+ ******************************************************************************/
+en_result_t Amx8x5_GetAnalogStatus(stc_amx8x5_handle_t* pstcHandle, uint8_t* pu8Status)
+{
+    AMX8X5_DEBUG_FUNC_START("Amx8x5_GetAnalogStatus");
+
+    if (pstcHandle == NULL)
+    {
+        return AMX8X5_FUNC_END(ErrorUninitialized);
+    }
+    if (pu8Status == NULL)
+    {
+        return AMX8X5_FUNC_END(ErrorInvalidParameter);
+    }
+
+    return AMX8X5_FUNC_END(Amx8x5_ReadByte(pstcHandle, AMX8X5_REG_ASTAT, pu8Status));
+}
+
+/**
+ ******************************************************************************
+ ** \brief  Configure the Batmode IO Register (0x27).
+ **
+ ** Controls the IOBM bit which determines whether the I2C/SPI interface is
+ ** kept enabled when the device switches to VBAT power state (Brownout).
+ ** This register requires the Configuration Key 0x9D to be written first.
+ **
+ ** see also #AMX8X5_REG_BATMODE_IO definition
+ **
+ ** \param  pstcHandle     RTC Handle
+ **
+ ** \param  bIoEnabled     true: I/O interface remains enabled in VBAT power state.
+ **                        false: I/O interface is disabled in VBAT power state (default, lower power).
+ **
+ ** \return Ok on success, else the Error as en_result_t
+ **
+ ** Example:
+ ** @code
+ ** Amx8x5_SetBatmodeIO(&stcRtcConfig, true);  //keep I/O active on battery
+ **
+ ** Amx8x5_SetBatmodeIO(&stcRtcConfig, false); //disable I/O on battery (default)
+ ** @endcode
+ **
+ ******************************************************************************/
+en_result_t Amx8x5_SetBatmodeIO(stc_amx8x5_handle_t* pstcHandle, bool bIoEnabled)
+{
+    en_result_t res;
+    AMX8X5_DEBUG_FUNC_START("Amx8x5_SetBatmodeIO");
+
+    if (pstcHandle == NULL)
+    {
+        return AMX8X5_FUNC_END(ErrorUninitialized);
+    }
+
+    // BATMODE_IO register requires Configuration Key 0x9D
+    res = Amx8x5_WriteByte(pstcHandle, AMX8X5_REG_CONFIG_KEY, AMX8X5_REG_CONFIG_KEY_VAL_OTHER);
+    if (res != Ok) return AMX8X5_FUNC_END(res);
+
+    if (true == bIoEnabled)
+    {
+        return AMX8X5_FUNC_END(Amx8x5_WriteByte(pstcHandle, AMX8X5_REG_BATMODE_IO, 0x80));
+    } else
+    {
+        return AMX8X5_FUNC_END(Amx8x5_WriteByte(pstcHandle, AMX8X5_REG_BATMODE_IO, 0x00));
+    }
+}
+
+/**
+ ******************************************************************************
  ** \brief  This function is controlling the behavior of the I/O pins under 
  **         various power down conditions.
  **
@@ -3829,6 +4003,46 @@ en_result_t Amx8x5_RamWrite(stc_amx8x5_handle_t* pstcHandle, uint8_t u8Address, 
 #ifdef __cplusplus
     #if defined(ARDUINO)
     #include <Arduino.h>
+
+    // -----------------------------------------------------------------------
+    // Platform capability detection
+    //
+    // AMX8X5_WIRE_AVAILABLE: Wire (I2C) is present on this platform.
+    //   Explicitly known platforms always have Wire. For unknown platforms
+    //   fall back to WIRE_INTERFACES_COUNT: include Wire when > 0 or when
+    //   the macro is not defined at all (conservative: assume available).
+    //
+    // AMX8X5_SPI_AVAILABLE: SPI is present on this platform.
+    //   Same logic as Wire. Additionally, if the user already included
+    //   <SPI.h> before this library, SPI is always considered available.
+    //
+    // Platforms with Wire and SPI always available:
+    //   AVR (Uno, Mega, Leonardo …), megaAVR (Nano Every),
+    //   ESP8266, ESP32 (all variants),
+    //   STM32 (Arduino_Core_STM32),
+    //   nRF52 (Adafruit / Arduino),
+    //   RP2040 (Arduino-Pico / Mbed),
+    //   SAMD (Zero, MKR …) — signalled by WIRE/SPI_INTERFACES_COUNT > 0
+    // -----------------------------------------------------------------------
+    #if defined(ARDUINO_ARCH_AVR)     || defined(ARDUINO_ARCH_MEGAAVR)  || \
+        defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32)    || \
+        defined(ARDUINO_ARCH_STM32)   || defined(ARDUINO_ARCH_NRF52)    || \
+        defined(ARDUINO_ARCH_RP2040)  || defined(ARDUINO_ARCH_MBED_RP2040) || \
+        !defined(WIRE_INTERFACES_COUNT) || (WIRE_INTERFACES_COUNT > 0)
+      #define AMX8X5_WIRE_AVAILABLE 1
+    #endif
+
+    #if defined(ARDUINO_ARCH_AVR)     || defined(ARDUINO_ARCH_MEGAAVR)  || \
+        defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32)    || \
+        defined(ARDUINO_ARCH_STM32)   || defined(ARDUINO_ARCH_NRF52)    || \
+        defined(ARDUINO_ARCH_RP2040)  || defined(ARDUINO_ARCH_MBED_RP2040) || \
+        (defined(SPI_INTERFACES_COUNT) && (SPI_INTERFACES_COUNT > 0))   || \
+        defined(SPI_H) || defined(_SPI_H_INCLUDED) || defined(SPI_H_)
+      #define AMX8X5_SPI_AVAILABLE 1
+    #endif
+    // -----------------------------------------------------------------------
+
+    #if defined(AMX8X5_WIRE_AVAILABLE)
     #include <Wire.h>
     static int i2cWrite(void* pHandle, uint32_t u32Address, uint8_t u8Register, uint8_t* pu8Data, uint32_t u32Len)
     {
@@ -3858,13 +4072,83 @@ en_result_t Amx8x5_RamWrite(stc_amx8x5_handle_t* pstcHandle, uint8_t u8Address, 
        
         return Ok;
     }
+    #endif // AMX8X5_WIRE_AVAILABLE
+
+    #if defined(AMX8X5_SPI_AVAILABLE)
+    #if !defined(SPI_H) && !defined(_SPI_H_INCLUDED) && !defined(SPI_H_)
+    #include <SPI.h>
     #endif
+    static SPISettings spiSettings(2000000, MSBFIRST, SPI_MODE0);
+
+    static int spiWrite(void* pHandle, uint32_t u32ChipSelect, uint8_t u8Register, uint8_t* pu8Data, uint32_t u32Len)
+    {
+        // AM08X5 SPI write: register byte with MSB=0 (write), then data bytes
+        SPI.beginTransaction(spiSettings);
+        digitalWrite((uint8_t)u32ChipSelect, LOW);
+        SPI.transfer(u8Register & 0x7F);
+        for (uint32_t i = 0; i < u32Len; i++)
+        {
+            SPI.transfer(pu8Data[i]);
+        }
+        digitalWrite((uint8_t)u32ChipSelect, HIGH);
+        SPI.endTransaction();
+        return Ok;
+    }
+
+    static int spiRead(void* pHandle, uint32_t u32ChipSelect, uint8_t u8Register, uint8_t* pu8Data, uint32_t u32Len)
+    {
+        // AM08X5 SPI read: register byte with MSB=1 (read), then receive data bytes
+        SPI.beginTransaction(spiSettings);
+        digitalWrite((uint8_t)u32ChipSelect, LOW);
+        SPI.transfer(u8Register | 0x80);
+        for (uint32_t i = 0; i < u32Len; i++)
+        {
+            pu8Data[i] = SPI.transfer(0x00);
+        }
+        digitalWrite((uint8_t)u32ChipSelect, HIGH);
+        SPI.endTransaction();
+        return Ok;
+    }
+    #endif // AMX8X5_SPI_AVAILABLE
+    #endif // ARDUINO
 
     bool AMx8x5::begin(void)
     {
-        #if defined(ARDUINO)
+        #if defined(ARDUINO) && defined(AMX8X5_WIRE_AVAILABLE)
         stcRtcConfig.pfnReadI2C = i2cRead;
         stcRtcConfig.pfnWriteI2C = i2cWrite;
+        #endif
+        if (Amx8x5_Init(&stcRtcConfig) == Ok)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @brief Initialise the RTC using the Arduino SPI library.
+     *
+     * Sets up the built-in SPI callbacks (2 MHz, SPI_MODE0) and configures
+     * the given pin as chip-select output.  Use this instead of begin() when
+     * the device type is a SPI variant (AM0815 / AM1815).
+     *
+     * Only available when <SPI.h> has been included before this library.
+     * On boards without SPI hardware simply omit <SPI.h> and this overload
+     * will not be compiled.
+     *
+     * @param u8CsPin  Arduino pin number connected to the RTC nCE/CS line.
+     * @return true on success (ID registers verified), false otherwise.
+     */
+    bool AMx8x5::begin(uint8_t u8CsPin)
+    {
+        #if defined(ARDUINO) && defined(AMX8X5_SPI_AVAILABLE)
+        pinMode(u8CsPin, OUTPUT);
+        digitalWrite(u8CsPin, HIGH);
+        SPI.begin();
+        stcRtcConfig.enMode        = AMx8x5ModeSPI;
+        stcRtcConfig.u32ChipSelect = (uint32_t)u8CsPin;
+        stcRtcConfig.pfnReadSpi    = spiRead;
+        stcRtcConfig.pfnWriteSpi   = spiWrite;
         #endif
         if (Amx8x5_Init(&stcRtcConfig) == Ok)
         {
@@ -4426,6 +4710,26 @@ en_result_t Amx8x5_RamWrite(stc_amx8x5_handle_t* pstcHandle, uint8_t u8Address, 
     AMx8x5::enResult  AMx8x5::enableIrqBatteryLow(bool bEnabled)
     {
         return Amx8x5_EnableIrqBatteryLow(&stcRtcConfig,bEnabled);
+    }
+
+    AMx8x5::enResult  AMx8x5::enableIrqOscillatorFail(bool bEnabled)
+    {
+        return Amx8x5_EnableIrqOscillatorFail(&stcRtcConfig,bEnabled);
+    }
+
+    AMx8x5::enResult  AMx8x5::enableIrqAutocalibFail(bool bEnabled)
+    {
+        return Amx8x5_EnableIrqAutocalibFail(&stcRtcConfig,bEnabled);
+    }
+
+    AMx8x5::enResult  AMx8x5::getAnalogStatus(uint8_t* pu8Status)
+    {
+        return Amx8x5_GetAnalogStatus(&stcRtcConfig,pu8Status);
+    }
+
+    AMx8x5::enResult  AMx8x5::setBatmodeIO(bool bIoEnabled)
+    {
+        return Amx8x5_SetBatmodeIO(&stcRtcConfig,bIoEnabled);
     }
 
     /**
