@@ -2872,6 +2872,7 @@ en_result_t Amx8x5_SetAutocalibration(stc_amx8x5_handle_t* pstcHandle, en_amx8x5
 en_result_t Amx8x5_RamRead(stc_amx8x5_handle_t* pstcHandle, uint8_t u8Address, uint8_t* pu8Data);
 en_result_t Amx8x5_RamWrite(stc_amx8x5_handle_t* pstcHandle, uint8_t u8Address, uint8_t u8Data);
 
+en_result_t Amx8x5_EnableOutput(stc_amx8x5_handle_t* pstcHandle, uint8_t u8Mask, bool bEnable);
 en_result_t Amx8x5_ClearRegister(stc_amx8x5_handle_t*, uint8_t u8Address, uint8_t u8Mask);
 en_result_t Amx8x5_SetRegister(stc_amx8x5_handle_t*, uint8_t u8Address, uint8_t u8Mask);
 en_result_t Amx8x5_ReadByte(stc_amx8x5_handle_t*, uint8_t u8Register, uint8_t* pu8Value);
@@ -3042,6 +3043,7 @@ class AMx8x5
       AMx8x5::enResult setWatchdog(uint32_t u32Period, AMx8x5::enWatchdogInterruptPin enPin);
       AMx8x5::enResult setSleepMode(uint8_t ui8Timeout, AMx8x5::enSleepMode enMode);
       AMx8x5::enResult getExtensionAddress(uint8_t u8Address, uint8_t* pu8ExtensionAddress);
+      AMx8x5::enResult enableOutput(uint8_t u8Mask, bool bEnable);
       AMx8x5::enResult setSquareWaveOutput(uint8_t u8SQFS, uint8_t u8PinMsk);
       AMx8x5::enResult selectOscillatorMode(AMx8x5::enOscSelect enSelect);
       AMx8x5::enResult setCountdown(AMx8x5::enPeriodeRange enRange, int32_t iPeriod, AMx8x5::enCountdownInterruptOutput enRepeat, AMx8x5::enCountdownInterruptPin enPin);

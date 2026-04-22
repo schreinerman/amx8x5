@@ -197,7 +197,13 @@ static void updateRtc(void)
 void setup(void)
 {
     Serial.begin(115200);
+#if defined(ARDUINO_ARCH_RP2040)
+    Wire.setSDA(I2C_SDA_PIN);
+    Wire.setSCL(I2C_SCL_PIN);
+    Wire.begin();
+#else
     Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
+#endif
     initRtc();
 }
 

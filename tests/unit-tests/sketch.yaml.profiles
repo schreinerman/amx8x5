@@ -1,0 +1,31 @@
+# arduino-cli profiles for the AMX8X5 unit test sketch.
+#
+# Used by: make unit-tests  (in tests/Makefile)
+# Each profile installs the required platform + AUnit library automatically.
+#
+# Supported profiles:  uno | rp2040 | esp32
+# ---------------------------------------------------------------------------
+
+profiles:
+  uno:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr
+    libraries:
+      - name: AUnit
+
+  rp2040:
+    fqbn: rp2040:rp2040:rpipico
+    platforms:
+      - platform: rp2040:rp2040
+        platform_index_url: https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+    libraries:
+      - name: AUnit
+
+  esp32:
+    fqbn: esp32:esp32:esp32
+    platforms:
+      - platform: esp32:esp32
+        platform_index_url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+    libraries:
+      - name: AUnit

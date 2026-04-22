@@ -343,6 +343,7 @@ static void AMX8X5_DEBUG_PRINT_BIN_U32(uint32_t u32Data)
  ** \return Ok on success, else the Error as en_result_t
  ** 
  ******************************************************************************/
+
 en_result_t Amx8x5_ClearRegister(stc_amx8x5_handle_t* pstcHandle, uint8_t u8Address, uint8_t u8Mask)
 {
     uint8_t u8Temp;
@@ -807,16 +808,8 @@ int16_t Amx8x5_GetHundredth(stc_amx8x5_handle_t* pstcHandle)
     {
         return AMX8X5_FUNC_END(-1);
     }
-    return AMX8X5_BCD_TO_DEC(u8Temp);
 
-    stcSysTime.u8Hundredth = AMX8X5_BCD_TO_DEC(pu8Buffer[0]);
-    stcSysTime.u8Second = AMX8X5_BCD_TO_DEC(pu8Buffer[1]);
-    stcSysTime.u8Minute = AMX8X5_BCD_TO_DEC(pu8Buffer[2]);
-    stcSysTime.u8Hour = pu8Buffer[3];
-    stcSysTime.u8Date = AMX8X5_BCD_TO_DEC(pu8Buffer[4]);
-    stcSysTime.u8Month = AMX8X5_BCD_TO_DEC(pu8Buffer[5]);
-    stcSysTime.u8Year = AMX8X5_BCD_TO_DEC(pu8Buffer[6]);
-    stcSysTime.u8Weekday = AMX8X5_BCD_TO_DEC(pu8Buffer[7]);
+    return AMX8X5_BCD_TO_DEC(u8Temp);
 }
 
 /**
@@ -4888,6 +4881,11 @@ en_result_t Amx8x5_RamWrite(stc_amx8x5_handle_t* pstcHandle, uint8_t u8Address, 
      ** 
      **
      ******************************************************************************/
+    AMx8x5::enResult AMx8x5::enableOutput(uint8_t u8Mask, bool bEnable)
+    {
+        return Amx8x5_EnableOutput(&stcRtcConfig, u8Mask, bEnable);
+    }
+
     AMx8x5::enResult  AMx8x5::setSquareWaveOutput(uint8_t u8SQFS, uint8_t u8PinMsk)
     {
         return Amx8x5_SetSquareWaveOutput(&stcRtcConfig,u8SQFS,u8PinMsk);

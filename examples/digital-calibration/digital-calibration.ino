@@ -65,8 +65,8 @@ void setup () {
     rtc.selectOscillatorMode(AMx8x5::enOscSelect::AMx8x5Xt32KHzNoSwitch);
 
     // Enable 32.768 kHz square wave output on FOUT/nIRQ for measurement
-    rtc.enableOutput(AMX8X5_REG_OCTRL_O1EN_MSK, true);
-    rtc.setSquareWaveOutput(1, 1); // SQFS=1 -> 32.768 kHz, pin mask 1 = FOUT/nIRQ
+    // setSquareWaveOutput with pinMsk=1 enables O1EN (FOUT/nIRQ) internally
+    rtc.setSquareWaveOutput(1, 1); // SQFS=1 -> 32.768 kHz, pinMsk=1 = FOUT/nIRQ
 
     Serial.println("32.768 kHz output active on FOUT/nIRQ.");
     Serial.println("Measure frequency with a counter, then set CALIBRATION_PPM and re-flash.");
