@@ -19,6 +19,11 @@ This driver can be used for Ambiq, Abracom and Microcrystal ABx8x5 / AMx8x5 RTCs
 ### Microcrystal
 - RV1805
 
+## Documentation
+
+- [Driver Guide](doc/driver-guide.md) — hardware overview, quickstart for Arduino / C / C++, and feature walkthroughs
+- [API Reference](doc/api-reference.md) — complete reference for all types, enums, register maps, C functions and C++ methods
+
 ## License:
 
 Created by Manuel Schreiner
